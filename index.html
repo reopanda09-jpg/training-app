@@ -186,6 +186,9 @@
   .timer-done-btn { background:linear-gradient(135deg,var(--pink-warm),var(--mauve)); color:white; border:none; border-radius:50px; padding:13px 0; font-size:14px; font-family:'Noto Sans JP',sans-serif; font-weight:500; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 16px rgba(184,120,128,0.3); width:100%; margin-bottom:10px; display:none; }
   .timer-done-btn:hover { transform:translateY(-1px); }
 </style>
+<!-- Firebase compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 </head>
 <body>
 <div class="app">
@@ -461,8 +464,27 @@ function dayLabel(days){
   return days.map(d=>DAY_NAMES[d]).join("・");
 }
 function tkey(){ return new Date().toISOString().split("T")[0]; }
-function gs(){ try{const r=localStorage.getItem("mbf_v1");return r?JSON.parse(r):{days:{},total:0,cw:57,weights:[]};}catch(e){return{days:{},total:0,cw:57,weights:[]};} }
-function ss(s){ try{localStorage.setItem("mbf_v1",JSON.stringify(s));}catch(e){} }
+// ===== FIREBASE REALTIME DATABASE =====
+const _fbConfig={apiKey:"AIzaSyAIdCKRH5h5V-eJKKDG3WnDicVWYJIj0I4",authDomain:"training-app-94eab.firebaseapp.com",databaseURL:"https://training-app-94eab-default-rtdb.firebaseio.com",projectId:"training-app-94eab",storageBucket:"training-app-94eab.firebasestorage.app",messagingSenderId:"954083149085",appId:"1:954083149085:web:8f33254fcd5f3f72a64df4"};
+firebase.initializeApp(_fbConfig);
+const _db=firebase.database();
+const _ref=_db.ref('mbf_v1');
+const _capRef=_db.ref('mbf_cap');
+function _fixArr(v){if(!v)return[];if(Array.isArray(v))return v;if(typeof v==='object')return Object.values(v);return[];}
+function _fixDays(days){if(!days)return{};const r={};for(const k in days){const d=days[k];r[k]={checked:_fixArr(d.checked),completed:d.completed||false};}return r;}
+let STATE={days:{},total:0,cw:57,weights:[]};
+function gs(){return STATE;}
+function ss(s){STATE=s;_ref.set(JSON.parse(JSON.stringify(s))).catch(e=>console.warn('FB write error',e));}
+_ref.on('value',snap=>{
+  const d=snap.val();
+  STATE=d?{days:_fixDays(d.days),total:d.total||0,cw:d.cw||57,weights:_fixArr(d.weights)}:{days:{},total:0,cw:57,weights:[]};
+  render();
+  try{const si=localStorage.getItem("mbf_img");if(si)showImg(si);}catch(e){}
+});
+_capRef.on('value',snap=>{
+  const v=snap.val();
+  if(v!=null){const el=document.getElementById("goal-caption");if(el&&document.activeElement!==el)el.value=v;}
+});
 function gtd(s){ const k=tkey();if(!s.days[k])s.days[k]={checked:[]};return s.days[k]; }
 function isChk(s,id){ return gtd(s).checked.includes(id); }
 
@@ -628,12 +650,9 @@ function render(){
   renderCal();
   renderSchedule();
   renderWeightChart();
-  try{
-    const si=localStorage.getItem("mbf_img");if(si)showImg(si);
-    const sc=localStorage.getItem("mbf_cap");if(sc)document.getElementById("goal-caption").value=sc;
-  }catch(e){}
 }
 document.getElementById("goal-caption").addEventListener("input",function(){
+  _capRef.set(this.value).catch(e=>console.warn('FB cap error',e));
   try{localStorage.setItem("mbf_cap",this.value);}catch(e){}
 });
 
