@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Beauty Fit</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Noto+Sans+JP:wght@400;500&display=swap');
+
+  :root {
+    --pink-light: #f5e6e8; --pink-mid: #e8c5cb; --pink-warm: #d4a0a8; --pink-deep: #b87880;
+    --blush: #f9eded; --mauve: #c9a0a8; --sage: #b8c5b0; --sage-light: #e8ede6;
+    --cream: #faf6f4; --taupe: #c4b5b0; --taupe-light: #f0ebe8;
+    --text-dark: #5a4548; --text-mid: #8a6d70; --text-light: #b09598;
+    --lavender: #ede8f5; --lavender-mid: #c8bce0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: linear-gradient(160deg, #fdf0f2 0%, #f5eaf5 50%, #eef0f8 100%);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+    color: var(--text-dark);
+  }
+
+  .app { max-width: 480px; margin: 0 auto; }
+
+  /* HEADER */
+  .header-bg {
+    background: linear-gradient(135deg, #f5e6e8 0%, #ede0e8 50%, #e8e0f0 100%);
+    border-radius: 24px; padding: 24px 20px; margin-bottom: 16px;
+    text-align: center; position: relative; overflow: hidden;
+    border: 1px solid rgba(212,160,168,0.3);
+  }
+  .header-bg::before { content:''; position:absolute; top:-24px; right:-24px; width:90px; height:90px; background:rgba(212,160,168,0.2); border-radius:50%; }
+  .header-bg::after  { content:''; position:absolute; bottom:-18px; left:12px; width:60px; height:60px; background:rgba(185,176,200,0.18); border-radius:50%; }
+  .header-title { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:600; color:var(--text-dark); position:relative; letter-spacing:0.04em; }
+  .header-sub { font-size:11px; color:var(--text-mid); margin-top:4px; position:relative; letter-spacing:0.08em; }
+  .date-chip { display:inline-block; background:rgba(255,255,255,0.7); border-radius:20px; padding:4px 16px; font-size:12px; color:var(--text-mid); margin-top:10px; position:relative; }
+
+  /* WEIGHT */
+  .section-card { background:white; border:1px solid var(--pink-mid); border-radius:18px; padding:16px 18px; margin-bottom:14px; }
+  .section-label { font-size:11px; font-weight:500; color:var(--text-light); letter-spacing:0.08em; margin-bottom:12px; }
+  .weight-row { display:flex; gap:8px; margin-bottom:14px; }
+  .w-box { flex:1; border-radius:12px; padding:10px 8px; text-align:center; border:1px solid var(--pink-light); }
+  .w-box.cur { background:var(--blush); border-color:var(--pink-warm); }
+  .w-box.step { background:white; border-color:var(--mauve); }
+  .w-box.fin { background:var(--sage-light); border-color:var(--sage); }
+  .w-label { font-size:10px; color:var(--text-light); margin-bottom:3px; }
+  .w-num { font-size:20px; font-weight:500; color:var(--text-dark); }
+  .w-unit { font-size:10px; color:var(--text-light); }
+  .prog-label { display:flex; justify-content:space-between; font-size:11px; color:var(--text-light); margin-bottom:5px; }
+  .prog-track { height:7px; background:var(--pink-light); border-radius:4px; overflow:hidden; }
+  .prog-fill { height:100%; background:linear-gradient(90deg,var(--pink-warm),var(--mauve)); border-radius:4px; transition:width 0.5s; }
+  .w-lost { text-align:center; font-size:12px; color:var(--pink-deep); font-weight:500; margin-top:8px; min-height:18px; }
+  .w-input-row { display:flex; gap:8px; align-items:center; margin-top:12px; padding-top:12px; border-top:1px solid var(--pink-light); }
+  .w-input-label { font-size:12px; color:var(--text-mid); white-space:nowrap; }
+  .w-input { flex:1; border:1px solid var(--pink-mid); border-radius:8px; padding:8px 10px; font-size:14px; font-family:'Noto Sans JP',sans-serif; color:var(--text-dark); background:white; outline:none; text-align:center; }
+  .w-input:focus { border-color:var(--pink-warm); }
+  .w-btn { background:var(--pink-warm); color:white; border:none; border-radius:8px; padding:8px 14px; font-size:12px; cursor:pointer; font-family:'Noto Sans JP',sans-serif; white-space:nowrap; }
+  .w-btn:hover { background:var(--pink-deep); }
+
+  /* GOAL IMAGE */
+  .goal-image-area { border:1.5px dashed var(--pink-warm); border-radius:12px; min-height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background:var(--blush); transition:background 0.2s; position:relative; overflow:hidden; }
+  .goal-image-area:hover { background:#f5e8ea; }
+  .goal-image-area img { width:100%; height:100%; object-fit:cover; border-radius:10px; position:absolute; top:0; left:0; }
+  .goal-placeholder { text-align:center; padding:20px; }
+  .goal-icon { font-size:26px; margin-bottom:8px; display:block; }
+  .goal-hint { font-size:12px; color:var(--text-mid); line-height:1.6; }
+  .goal-hint strong { color:var(--pink-deep); }
+  .goal-caption { width:100%; background:transparent; border:none; border-bottom:1px solid var(--pink-mid); padding:8px 4px; font-size:13px; color:var(--text-dark); font-family:'Noto Sans JP',sans-serif; outline:none; margin-top:10px; }
+  .goal-caption::placeholder { color:var(--text-light); }
+  #file-input { display:none; }
+  .img-clear-btn { position:absolute; top:6px; right:6px; background:rgba(255,255,255,0.9); border:none; border-radius:50%; width:26px; height:26px; font-size:14px; cursor:pointer; display:none; align-items:center; justify-content:center; color:var(--text-mid); z-index:2; }
+
+  /* STREAK */
+  .streak-bar { display:flex; align-items:center; background:linear-gradient(135deg,#ede8f5,#f5e6e8); border-radius:16px; padding:14px 10px; margin-bottom:14px; border:1px solid var(--pink-mid); }
+  .streak-item { text-align:center; flex:1; }
+  .streak-num { font-size:22px; font-weight:500; color:var(--pink-deep); }
+  .streak-label { font-size:11px; color:var(--text-mid); margin-top:2px; }
+  .streak-div { width:1px; height:32px; background:var(--pink-mid); }
+
+  /* CALENDAR */
+  .cal-row { display:flex; gap:5px; justify-content:center; margin-bottom:14px; }
+  .cal-day { width:36px; height:40px; border-radius:10px; border:1px solid var(--pink-light); display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:var(--text-mid); background:white; gap:2px; }
+  .cal-day .cl { font-size:10px; color:var(--text-light); }
+  .cal-day.done { background:linear-gradient(135deg,var(--pink-warm),var(--mauve)); border-color:var(--pink-warm); color:white; }
+  .cal-day.done .cl { color:rgba(255,255,255,0.8); }
+  .cal-day.today { border:2px solid var(--pink-warm); font-weight:500; }
+
+  /* PROGRESS */
+  .prog-wrap { margin-bottom:14px; }
+  .prog-row { display:flex; justify-content:space-between; font-size:12px; color:var(--text-mid); margin-bottom:6px; }
+  .prog-track2 { height:8px; background:var(--pink-light); border-radius:4px; overflow:hidden; }
+  .prog-fill2 { height:100%; background:linear-gradient(90deg,var(--pink-warm),var(--mauve)); border-radius:4px; transition:width 0.4s; }
+
+  /* COMPLETE */
+  .complete-msg { text-align:center; padding:14px; background:linear-gradient(135deg,#f5e6e8,#ede0f0); border-radius:14px; font-size:14px; color:var(--pink-deep); font-weight:500; display:none; margin-bottom:14px; border:1px solid var(--pink-mid); }
+
+  /* TASKS */
+  .task-card { background:white; border:1px solid var(--pink-light); border-radius:12px; padding:12px 14px; margin-bottom:7px; display:flex; align-items:center; gap:10px; cursor:pointer; transition:all 0.2s; -webkit-tap-highlight-color:transparent; }
+  .task-card:hover { background:var(--blush); border-color:var(--pink-warm); }
+  .task-card.done { background:var(--sage-light); border-color:var(--sage); opacity:0.85; }
+  .task-card.done .task-name { text-decoration:line-through; color:var(--text-mid); }
+  .checkbox { width:22px; height:22px; border-radius:50%; border:1.5px solid var(--pink-warm); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.2s; background:white; }
+  .checkbox.checked { background:var(--pink-deep); border-color:var(--pink-deep); }
+  .chk-icon { display:none; color:white; font-size:13px; font-weight:600; }
+  .checkbox.checked .chk-icon { display:block; }
+  .task-name { font-size:14px; font-weight:500; color:var(--text-dark); }
+  .task-sub { font-size:11px; color:var(--text-light); margin-top:2px; }
+  .task-dur { font-size:10px; color:var(--mauve); margin-top:2px; }
+  .must-badge { font-size:10px; background:#fce8ea; color:#b87880; padding:3px 8px; border-radius:20px; flex-shrink:0; font-weight:500; border:1px solid #eec8cc; }
+  .food-badge { font-size:10px; background:var(--sage-light); color:#7a9070; padding:3px 8px; border-radius:20px; flex-shrink:0; font-weight:500; border:1px solid var(--sage); }
+  .day-badge { font-size:10px; background:var(--lavender); color:#7060a0; padding:3px 8px; border-radius:20px; flex-shrink:0; font-weight:500; border:1px solid var(--lavender-mid); }
+
+  /* TIMER BUTTON */
+  .timer-btn { background:linear-gradient(135deg,var(--pink-warm),var(--mauve)); color:white; border:none; border-radius:16px; padding:5px 11px; font-size:11px; cursor:pointer; font-family:'Noto Sans JP',sans-serif; font-weight:500; white-space:nowrap; flex-shrink:0; transition:all 0.2s; }
+  .timer-btn:hover { opacity:0.85; transform:scale(1.04); }
+
+  /* TODAY TIME BANNER */
+  .today-banner { display:flex; align-items:center; justify-content:space-between; background:var(--blush); border:1px solid var(--pink-light); border-radius:12px; padding:9px 14px; margin-bottom:12px; }
+  .today-banner-lbl { font-size:12px; color:var(--text-mid); }
+  .today-banner-val { font-size:13px; font-weight:500; color:var(--pink-deep); }
+
+  /* WEEKLY SCHEDULE */
+  .schedule-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+  .sch-col { border-radius:10px; padding:7px 4px; text-align:center; border:1px solid var(--pink-light); background:white; }
+  .sch-col.sch-today { border-color:var(--pink-warm); background:var(--blush); }
+  .sch-col.sch-arm { background:#f0ebf8; border-color:var(--lavender-mid); }
+  .sch-col.sch-lower { background:#edf5eb; border-color:var(--sage); }
+  .sch-day { font-size:11px; font-weight:500; color:var(--text-mid); margin-bottom:5px; }
+  .sch-icons { font-size:9px; color:var(--text-light); line-height:1.6; }
+  .sch-rest { font-size:9px; color:var(--text-light); margin-top:2px; }
+
+  /* ADVICE */
+  .advice-section { background:var(--taupe-light); border-radius:16px; padding:14px 16px; margin-bottom:14px; border:1px solid var(--taupe); }
+  .advice-title { font-size:11px; font-weight:500; color:var(--text-mid); margin-bottom:10px; letter-spacing:0.06em; }
+  .advice-item { font-size:12px; color:var(--text-dark); padding:6px 0; border-bottom:1px solid rgba(196,181,176,0.4); display:flex; align-items:flex-start; gap:8px; line-height:1.6; }
+  .advice-item:last-child { border-bottom:none; padding-bottom:0; }
+  .adot { width:5px; height:5px; border-radius:50%; background:var(--pink-warm); margin-top:6px; flex-shrink:0; }
+
+  .reset-btn { display:block; width:100%; padding:10px; background:transparent; border:1px solid var(--pink-mid); border-radius:12px; font-size:12px; color:var(--text-light); cursor:pointer; text-align:center; font-family:'Noto Sans JP',sans-serif; }
+  .reset-btn:hover { background:var(--blush); color:var(--text-mid); }
+
+  /* WEIGHT CHART */
+  .chart-period-row { display:flex; gap:6px; margin-bottom:12px; }
+  .chart-period-btn { flex:1; padding:5px 0; border:1px solid var(--pink-mid); border-radius:20px; background:white; font-size:11px; font-family:'Noto Sans JP',sans-serif; color:var(--text-mid); cursor:pointer; transition:all 0.2s; }
+  .chart-period-btn.active { background:var(--pink-warm); color:white; border-color:var(--pink-warm); }
+  .chart-period-btn:hover:not(.active) { background:var(--blush); }
+  .chart-legend { display:flex; align-items:center; gap:8px; margin-top:8px; font-size:10px; color:var(--text-light); flex-wrap:wrap; }
+  .legend-dot { width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; }
+  .legend-line { width:20px; display:inline-block; flex-shrink:0; }
+
+  /* ===== TIMER MODAL (shared base) ===== */
+  .timer-overlay { display:none; position:fixed; inset:0; background:rgba(90,69,72,0.5); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center; }
+  .timer-overlay.open { display:flex; }
+  .timer-modal { background:linear-gradient(160deg,#fdf0f2 0%,#f5eaf5 60%,#eef0f8 100%); border-radius:28px; padding:28px 24px 24px; width:300px; max-width:90vw; text-align:center; border:1px solid rgba(212,160,168,0.4); box-shadow:0 20px 60px rgba(90,69,72,0.25); }
+  .timer-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--text-dark); letter-spacing:0.06em; margin-bottom:4px; }
+  .timer-sub { font-size:12px; color:var(--text-mid); letter-spacing:0.08em; margin-bottom:20px; }
+  .timer-circle { width:140px; height:140px; margin:0 auto 14px; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:white; border:3px solid var(--pink-light); box-shadow:0 4px 20px rgba(184,120,128,0.12); transition:border-color 0.4s,box-shadow 0.4s; }
+  .timer-circle.c-set  { border-color:var(--pink-warm); box-shadow:0 4px 24px rgba(184,120,128,0.3); }
+  .timer-circle.c-rest { border-color:var(--sage); box-shadow:0 4px 24px rgba(184,197,176,0.3); }
+  .timer-circle.c-done { border-color:var(--sage); }
+  .timer-num { font-family:'Cormorant Garamond',serif; font-size:64px; font-weight:500; color:var(--pink-deep); line-height:1; transition:color 0.3s; }
+  .timer-num.n-warn { color:#c04060; }
+  .timer-num.n-prep { color:var(--mauve); font-size:52px; }
+  .timer-num.n-rest { color:var(--sage); }
+  .timer-num.n-rep  { color:var(--pink-deep); font-size:48px; }
+  .timer-num.n-done { color:var(--sage); font-size:48px; }
+  .timer-unit { font-size:12px; color:var(--text-light); margin-top:3px; }
+  .timer-bar-track { height:6px; background:var(--pink-light); border-radius:4px; overflow:hidden; margin-bottom:14px; }
+  .timer-bar-fill { height:100%; background:linear-gradient(90deg,var(--pink-warm),var(--mauve)); border-radius:4px; width:0%; transition:width 0.35s ease; }
+  .timer-bar-fill.b-rest { background:linear-gradient(90deg,var(--sage),#c5d8c0); }
+  .timer-msg { font-size:13px; color:var(--text-mid); min-height:42px; line-height:1.75; margin-bottom:14px; padding:0 4px; }
+  .timer-dots { display:flex; gap:8px; justify-content:center; margin-bottom:20px; }
+  .timer-dot { width:10px; height:10px; border-radius:50%; background:var(--pink-light); border:1.5px solid var(--pink-mid); transition:all 0.3s; }
+  .timer-dot.d-active { background:var(--pink-warm); border-color:var(--pink-warm); transform:scale(1.25); }
+  .timer-dot.d-done   { background:var(--sage); border-color:var(--sage); }
+  .timer-btn-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .timer-start-btn { background:linear-gradient(135deg,var(--pink-warm),var(--mauve)); color:white; border:none; border-radius:50px; padding:11px 28px; font-size:14px; font-family:'Noto Sans JP',sans-serif; font-weight:500; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 16px rgba(184,120,128,0.3); }
+  .timer-start-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(184,120,128,0.4); }
+  .timer-close-btn { background:transparent; color:var(--text-light); border:1px solid var(--pink-mid); border-radius:50px; padding:11px 18px; font-size:13px; font-family:'Noto Sans JP',sans-serif; cursor:pointer; transition:all 0.2s; }
+  .timer-close-btn:hover { background:var(--blush); }
+  .timer-done-btn { background:linear-gradient(135deg,var(--pink-warm),var(--mauve)); color:white; border:none; border-radius:50px; padding:13px 0; font-size:14px; font-family:'Noto Sans JP',sans-serif; font-weight:500; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 16px rgba(184,120,128,0.3); width:100%; margin-bottom:10px; display:none; }
+  .timer-done-btn:hover { transform:translateY(-1px); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header-bg">
+    <div class="header-title">My Beauty Fit</div>
+    <div class="header-sub">スタイルも心も、整えていく</div>
+    <div class="date-chip" id="date-label"></div>
+  </div>
+
+  <!-- 体重 -->
+  <div class="section-card">
+    <div class="section-label">WEIGHT GOAL</div>
+    <div class="weight-row">
+      <div class="w-box cur"><div class="w-label">現在</div><div class="w-num" id="disp-cur">57.0</div><div class="w-unit">kg</div></div>
+      <div class="w-box step"><div class="w-label">まず目標</div><div class="w-num">53.0</div><div class="w-unit">kg</div></div>
+      <div class="w-box fin"><div class="w-label">最終目標</div><div class="w-num">49.0</div><div class="w-unit">kg</div></div>
+    </div>
+    <div class="prog-label"><span>57kg → 49kg（最終目標まで）</span><span id="wpct">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="wfill" style="width:0%"></div></div>
+    <div class="w-lost" id="wlost"></div>
+    <div class="w-input-row">
+      <div class="w-input-label">今日の体重</div>
+      <input class="w-input" type="number" id="w-input" step="0.1" min="30" max="120" placeholder="57.0">
+      <button class="w-btn" onclick="saveWeight()">記録</button>
+    </div>
+  </div>
+
+  <!-- 体重グラフ -->
+  <div class="section-card" id="weight-chart-card">
+    <div class="section-label">WEIGHT HISTORY</div>
+    <div class="chart-period-row">
+      <button class="chart-period-btn active" id="btn-30" onclick="setChartPeriod(30)">30日</button>
+      <button class="chart-period-btn" id="btn-60" onclick="setChartPeriod(60)">60日</button>
+      <button class="chart-period-btn" id="btn-90" onclick="setChartPeriod(90)">90日</button>
+    </div>
+    <canvas id="weight-chart" style="width:100%;height:160px;display:block;"></canvas>
+    <div class="chart-legend">
+      <span class="legend-dot" style="background:var(--pink-deep)"></span><span>記録</span>
+      <span class="legend-line" style="border-top:1.5px dashed var(--mauve)"></span><span>53kg目標</span>
+      <span class="legend-line" style="border-top:1.5px dashed var(--sage)"></span><span>49kg目標</span>
+    </div>
+  </div>
+
+  <!-- 目標画像 -->
+  <div class="section-card">
+    <div class="section-label">MY MOTIVATION PHOTO ✦</div>
+    <div class="goal-image-area" id="goal-area" onclick="document.getElementById('file-input').click()">
+      <button class="img-clear-btn" id="clear-btn" onclick="clearImage(event)">✕</button>
+      <div class="goal-placeholder" id="goal-ph">
+        <span class="goal-icon">🐾</span>
+        <div class="goal-hint"><strong>やる気の源になる写真</strong>をここに貼ろう<br>愛犬・家族・お気に入りの景色…なんでもOK<br><span style="font-size:10px;color:var(--text-light)">タップして写真を選択</span></div>
+      </div>
+    </div>
+    <input class="goal-caption" type="text" id="goal-caption" placeholder="例：この子のために毎日続けよう！" maxlength="50">
+    <input type="file" id="file-input" accept="image/*" onchange="handleImage(event)">
+  </div>
+
+  <!-- ストリーク -->
+  <div class="streak-bar">
+    <div class="streak-item"><div class="streak-num" id="streak">0</div><div class="streak-label">継続日数</div></div>
+    <div class="streak-div"></div>
+    <div class="streak-item"><div class="streak-num" id="done-cnt">0</div><div class="streak-label">今日の完了</div></div>
+    <div class="streak-div"></div>
+    <div class="streak-item"><div class="streak-num" id="total-cnt">0</div><div class="streak-label">累計達成日</div></div>
+  </div>
+
+  <!-- 週カレンダー -->
+  <div class="section-card" style="padding:14px 16px;">
+    <div class="section-label">THIS WEEK</div>
+    <div class="cal-row" id="cal"></div>
+  </div>
+
+  <!-- 達成率 -->
+  <div class="prog-wrap">
+    <div class="prog-row"><span>今日の達成率</span><span id="pct">0%</span></div>
+    <div class="prog-track2"><div class="prog-fill2" id="pfill" style="width:0%"></div></div>
+  </div>
+
+  <div class="complete-msg" id="complete-msg">今日のメニュー全部完了！素敵なマダムに近づいてる 🌸</div>
+
+  <!-- トレーニング -->
+  <div class="section-card">
+    <div class="section-label">TODAY'S TRAINING</div>
+    <div class="today-banner">
+      <span class="today-banner-lbl" id="today-menu-lbl">本日のメニュー</span>
+      <span class="today-banner-val" id="today-time-val"></span>
+    </div>
+    <div id="exercise-list"></div>
+  </div>
+
+  <!-- 週間スケジュール -->
+  <div class="section-card">
+    <div class="section-label">WEEKLY SCHEDULE</div>
+    <div class="schedule-grid" id="schedule-grid"></div>
+    <div style="margin-top:10px;font-size:10px;color:var(--text-light);line-height:1.8;">
+      ※ 腹筋＋サイドクランチ＋プランクは毎日必須（約11分）<br>
+      月・木は二の腕強化（+椅子ディップス）で合計約14分<br>
+      火・金は下半身強化（+スクワット・ランジ・ヒップリフト）で合計約24分<br>
+      水・土・日は必須3種のみでOK
+    </div>
+  </div>
+
+  <!-- 食事 -->
+  <div class="section-card">
+    <div class="section-label">FOOD CHECK</div>
+    <div id="food-list"></div>
+  </div>
+
+  <!-- アドバイス -->
+  <div class="advice-section">
+    <div class="advice-title">40代のボディメイクのヒント</div>
+    <div class="advice-item"><div class="adot"></div><span>夜20時以降は炭水化物を控えめに。どうしても食べたいならたんぱく質を</span></div>
+    <div class="advice-item"><div class="adot"></div><span>筋トレ後30分以内にプロテインまたは卵・豆腐など。筋肉が育ちやすくなる</span></div>
+    <div class="advice-item"><div class="adot"></div><span>水を1日1.5L以上飲むと代謝と肌ツヤが上がりやすい</span></div>
+    <div class="advice-item"><div class="adot"></div><span>睡眠7時間以上で成長ホルモンが活発になりボディラインが整いやすくなる</span></div>
+  </div>
+
+  <button class="reset-btn" onclick="resetDay()">今日のチェックをリセット</button>
+
+</div>
+
+<!-- ===== PLANK TIMER MODAL ===== -->
+<div class="timer-overlay" id="plank-overlay">
+  <div class="timer-modal">
+    <div class="timer-title">PLANK TIMER</div>
+    <div class="timer-sub" id="plank-set-lbl">3セット × 30秒</div>
+    <div class="timer-circle" id="plank-circle">
+      <div class="timer-num" id="plank-num">30</div>
+      <div class="timer-unit" id="plank-unit">秒</div>
+    </div>
+    <div class="timer-bar-track"><div class="timer-bar-fill" id="plank-bar-fill"></div></div>
+    <div class="timer-msg" id="plank-msg">スタートボタンを押して<br>プランクを始めましょう！</div>
+    <div class="timer-dots" id="plank-dots">
+      <div class="timer-dot" id="plank-dot-1"></div>
+      <div class="timer-dot" id="plank-dot-2"></div>
+      <div class="timer-dot" id="plank-dot-3"></div>
+    </div>
+    <div class="timer-btn-row">
+      <button class="timer-start-btn" id="plank-start-btn" onclick="startPlankTimer()">▶ スタート</button>
+      <button class="timer-close-btn" onclick="closeTimer('plank')">✕ 閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REP TIMER MODAL ===== -->
+<div class="timer-overlay" id="rep-overlay">
+  <div class="timer-modal">
+    <div class="timer-title" id="rep-title">腹筋（クランチ）</div>
+    <div class="timer-sub" id="rep-sub">3セット × 30回</div>
+    <div class="timer-circle" id="rep-circle">
+      <div class="timer-num n-rep" id="rep-num">1</div>
+      <div class="timer-unit" id="rep-unit">セット目</div>
+    </div>
+    <div class="timer-bar-track"><div class="timer-bar-fill" id="rep-bar-fill"></div></div>
+    <div class="timer-msg" id="rep-msg">スタートボタンを押してください</div>
+    <div class="timer-dots" id="rep-dots"></div>
+    <div style="width:100%;margin-bottom:10px;">
+      <button class="timer-done-btn" id="rep-done-btn" onclick="repSetComplete()">✓ このセット完了！</button>
+    </div>
+    <div class="timer-btn-row">
+      <button class="timer-start-btn" id="rep-start-btn" onclick="startRepTimer()">▶ スタート</button>
+      <button class="timer-close-btn" onclick="closeTimer('rep')">✕ 閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const EXERCISES=[
+  {
+    id:"abs1", name:"腹筋（クランチ）", sub:"30回 × 3セット", must:true,
+    days:[0,1,2,3,4,5,6], dur:"約5分", type:"rep", sets:3, reps:30, rest:30,
+    voice:{
+      intro:"腹筋クランチを始めましょう！まず仰向けに寝て、膝を立てて足を腰幅に開いてください。両手は頭の後ろにそっと添えるだけ、首には力を入れないでください。息を吐きながら肩甲骨が床から浮くくらい上体を起こして、吸いながらゆっくり戻す。この動きを繰り返します。準備はいいですか？",
+      setStart:n=>`${n}セット目スタート！30回、反動を使わずにゆっくり丁寧にやっていきましょう！`,
+      form:"首を引っ張っていませんか？手は頭に添えるだけですよ。お腹の力だけで起き上がる感覚を意識して！",
+      encourage:"きつくなってきましたね！でも今が一番お腹に効いている瞬間です。自分に負けないで！あとちょっとです！",
+      setDone:n=>`${n}セット完了！素晴らしい！よく頑張りました！`,
+      rest:n=>`${n}秒休憩します。肩の力を抜いて深呼吸してください。`,
+      nextSet:n=>`${n}セット目の準備をしてください！`,
+      done:"腹筋クランチ、全セット完了！お腹の筋肉がしっかり刺激されましたよ！この積み重ねが必ず結果につながります！"
+    }
+  },
+  {
+    id:"abs2", name:"プランク", sub:"30秒 × 3セット", must:true,
+    days:[0,1,2,3,4,5,6], dur:"約3分", type:"plank"
+  },
+  {
+    id:"side", name:"サイドクランチ", sub:"左右15回 × 2セット", must:false,
+    days:[0,1,2,3,4,5,6], dur:"約3分", type:"rep", sets:2, reps:15, rest:20,
+    voice:{
+      intro:"サイドクランチで脇腹を引き締めましょう！まず仰向けに寝てください。両膝を立てた状態で、足は床についたまま、両膝を右側にゆっくりと倒します。倒れたら両腕は体の横に自然に置いてください。頭の後ろに手を組む必要はありませんよ。この状態から、息を吐きながら上体をほんの少しだけ起こします。肩甲骨が床から5センチくらい浮けば十分！大きく起き上がろうとしなくていいです。右側15回終わったら、今度は膝を左側に倒して同じように15回やります。では右側から始めましょう！",
+      setStart:n=>`${n}セット目スタート！まず右膝を倒した状態で15回、脇腹をゆっくり絞っていきましょう！`,
+      form:"腕に力を入れず、脇腹だけで体を起こす感覚を意識してください。大きく起き上がらなくていいですよ。少し浮く程度で脇腹にじわじわ効いてきます！",
+      encourage:"きつくなってきましたか？やめたくなる気持ち、よくわかります。でも今が一番脂肪に効いている瞬間です！最後まで諦めないで！必ず変わります！",
+      setDone:n=>`${n}セット完了！脇腹にしっかり効いていますよ！よく頑張りました！`,
+      rest:n=>`${n}秒休憩。深呼吸して、次のセットに備えてください。`,
+      nextSet:n=>`最後の${n}セット目！もう一息です！`,
+      done:"サイドクランチ全セット完了！続けることで脇腹がどんどんすっきりしていきます。諦めなかった自分を褒めてください！"
+    }
+  },
+  {
+    id:"push", name:"椅子ディップス", sub:"10回 × 2セット", must:false,
+    days:[1,4], dur:"約3分", type:"rep", sets:2, reps:10, rest:20,
+    voice:{
+      intro:"椅子ディップスで二の腕を集中的に引き締めましょう！まず、安定した椅子やソファの端に腰掛けてください。両手を腰の真横につきます。このとき指先は必ず前向きにしてください。次に、お尻をゆっくり椅子の前にずらして、椅子の端に手だけが残っている状態にします。足は床につけて、膝は軽く曲げてください。背中は椅子のすぐ近くにキープ。この姿勢から、肘をゆっくり後ろに引くように曲げて体を下ろします。肘が直角になったら、腕の力でゆっくり元に戻す。これを10回繰り返します。腕立て伏せより断然楽にできますよ！準備ができたら始めましょう！",
+      setStart:n=>`${n}セット目スタート！肘をゆっくり後ろに曲げて、ゆっくり伸ばす。二の腕の裏側に効かせていきましょう！`,
+      form:"肘が外に開いていませんか？肘は体の真後ろに向けるイメージです。背中は椅子の端に近づけたまま、体は真っ直ぐキープしてください！",
+      encourage:"腕が重くなってきましたね！それが効いている証拠です！二の腕がぷるぷるしてきたら大成功！自分に甘えないで、あと少し頑張って！",
+      setDone:n=>`${n}セット完了！二の腕の裏側にしっかり効いています！素晴らしい！`,
+      rest:n=>`${n}秒休憩。腕を軽く振って楽にしてください。`,
+      nextSet:n=>`最後の${n}セット目！もう一踏ん張りです！`,
+      done:"椅子ディップス全セット完了！二の腕がどんどん引き締まります！月曜と木曜に続けることが美しい二の腕への近道ですよ！"
+    }
+  },
+  {
+    id:"sq1", name:"スクワット", sub:"20回 × 3セット", must:false,
+    days:[2,5], dur:"約5分", type:"rep", sets:3, reps:20, rest:30,
+    voice:{
+      intro:"スクワットで下半身を引き締めましょう！足を肩幅に開いて、つま先は少し外向きに向けてください。膝がつま先より前に出ないよう、お尻を後ろに突き出すイメージでしゃがみます。背筋は真っ直ぐ、視線は正面。深く下りるほど効果が上がります！",
+      setStart:n=>`${n}セット目スタート！20回、ゆっくり深くしゃがんでください！`,
+      form:"膝がつま先より前に出ていないか確認してください。お尻を後ろに突き出すイメージで！背筋は真っ直ぐ保って！",
+      encourage:"太ももが燃えてきましたね！今が一番効いています。やめたくなる気持ちはわかりますよ！でも続けることが美しい体への一歩です！",
+      setDone:n=>`${n}セット完了！お尻と太ももが鍛えられています！`,
+      rest:n=>`${n}秒休憩。水分補給して深呼吸してください。`,
+      nextSet:n=>`${n}セット目！引き続き頑張りましょう！`,
+      done:"スクワット完了！美しい下半身ラインに近づいています！"
+    }
+  },
+  {
+    id:"lunge", name:"ランジ", sub:"左右10回 × 2セット", must:false,
+    days:[2,5], dur:"約4分", type:"rep", sets:2, reps:10, rest:20,
+    voice:{
+      intro:"ランジで美脚を作りましょう！両足を揃えて立ったら、片足を大きく一歩前に踏み出します。前の膝が90度になるまで下ろして、元に戻す。これを左右交互に10回ずつ。背筋は真っ直ぐ、視線は正面をキープしてください！",
+      setStart:n=>`${n}セット目！左右交互に10回ずつ、バランスを意識してゆっくり丁寧に！`,
+      form:"前の膝はつま先の真上に来るようにしてください。膝が内側に入らないよう注意して！背筋は真っ直ぐですよ！",
+      encourage:"ふらつきますよね！でも続けることが大事です。今日できた分だけ、確実に体が変わっています！諦めないで！",
+      setDone:n=>`${n}セット完了！太ももとお尻にしっかり効いてますよ！`,
+      rest:n=>`${n}秒休憩。足を軽く動かしてください。`,
+      nextSet:n=>`最後の${n}セット目！最後まで丁寧に！`,
+      done:"ランジ完了！脚全体がすっきり引き締まってきます！"
+    }
+  },
+  {
+    id:"hip", name:"ヒップリフト", sub:"20回 × 2セット", must:false,
+    days:[2,5], dur:"約4分", type:"rep", sets:2, reps:20, rest:20,
+    voice:{
+      intro:"ヒップリフトでヒップラインを整えましょう！仰向けに寝て、膝を立てて足は腰幅に開いてください。足の裏は床にしっかりつけて。この状態からお尻をゆっくり持ち上げます。肩から膝が一直線になったところで2秒止めてください。お尻の筋肉をぎゅっと絞る感覚が大事です！ゆっくり下ろして、また上げる。これを20回繰り返します！",
+      setStart:n=>`${n}セット目スタート！20回、お尻を上げたところでしっかり2秒キープ！`,
+      form:"お尻を上げたところで止まっていますか？腰が反りすぎないよう、お腹にも少し力を入れてください。お尻の筋肉を絞る感覚が大事ですよ！",
+      encourage:"お尻が重くなってきましたか？それが効いている証拠！美しいヒップラインを目指して、最後まで諦めないで！",
+      setDone:n=>`${n}セット完了！お尻の筋肉がしっかり収縮しましたよ！`,
+      rest:n=>`${n}秒休憩。深呼吸してください。`,
+      nextSet:n=>`最後の${n}セット目！美尻を目指して！`,
+      done:"ヒップリフト完了！ヒップラインが整ってきます！毎週続けることが大事ですよ！"
+    }
+  },
+];
+const FOODS=[
+  {id:"f1",name:"夜21時以降は食べない",sub:"夜の食べ過ぎ対策"},
+  {id:"f2",name:"夕食の炭水化物を半分に",sub:"代謝アップの基本"},
+  {id:"f3",name:"たんぱく質を確保した",sub:"体重×1g以上を目安に"},
+  {id:"f4",name:"水を1.5L以上飲んだ",sub:"代謝・肌ツヤサポート"},
+];
+const S=57,F=49;
+const DAY_NAMES=["日","月","火","水","木","金","土"];
+
+function todayDow(){ return new Date().getDay(); }
+function todayExs(){ const d=todayDow(); return EXERCISES.filter(e=>e.days.includes(d)); }
+function dayLabel(days){
+  if(days.length===7)return"毎日";
+  return days.map(d=>DAY_NAMES[d]).join("・");
+}
+function tkey(){ return new Date().toISOString().split("T")[0]; }
+function gs(){ try{const r=localStorage.getItem("mbf_v1");return r?JSON.parse(r):{days:{},total:0,cw:57,weights:[]};}catch(e){return{days:{},total:0,cw:57,weights:[]};} }
+function ss(s){ try{localStorage.setItem("mbf_v1",JSON.stringify(s));}catch(e){} }
+function gtd(s){ const k=tkey();if(!s.days[k])s.days[k]={checked:[]};return s.days[k]; }
+function isChk(s,id){ return gtd(s).checked.includes(id); }
+
+function toggle(id){
+  const s=gs(),td=gtd(s),ix=td.checked.indexOf(id);
+  if(ix===-1)td.checked.push(id);else td.checked.splice(ix,1);
+  const all=[...todayExs().map(e=>e.id),...FOODS.map(f=>f.id)];
+  if(all.every(i=>td.checked.includes(i))&&!td.completed){td.completed=true;s.total=(s.total||0)+1;}
+  ss(s);render();
+}
+function resetDay(){
+  const s=gs(),k=tkey();
+  if(s.days[k]){if(s.days[k].completed&&s.total>0)s.total--;s.days[k]={checked:[]};}
+  ss(s);render();
+}
+function saveWeight(){
+  const v=parseFloat(document.getElementById("w-input").value);
+  if(isNaN(v)||v<30||v>120)return;
+  const s=gs();
+  s.cw=v;
+  if(!s.weights)s.weights=[];
+  const k=tkey();
+  const idx=s.weights.findIndex(w=>w.d===k);
+  if(idx>=0)s.weights[idx].w=v; else s.weights.push({d:k,w:v});
+  s.weights.sort((a,b)=>a.d.localeCompare(b.d));
+  if(s.weights.length>90)s.weights=s.weights.slice(-90);
+  ss(s);render();
+  document.getElementById("w-input").value="";
+}
+function calcStreak(s){
+  let n=0;const t=new Date(),mids=EXERCISES.filter(e=>e.must).map(e=>e.id);
+  for(let i=0;i<365;i++){
+    const d=new Date(t);d.setDate(t.getDate()-i);
+    const k=d.toISOString().split("T")[0],day=s.days[k];
+    if(!day)break;
+    if(mids.every(id=>day.checked&&day.checked.includes(id)))n++;
+    else if(i>0)break;
+  }return n;
+}
+function handleImage(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{localStorage.setItem("mbf_img",ev.target.result);}catch(err){}showImg(ev.target.result);};
+  r.readAsDataURL(f);
+}
+function showImg(src){
+  const a=document.getElementById("goal-area"),ph=document.getElementById("goal-ph"),cb=document.getElementById("clear-btn");
+  let img=document.getElementById("goal-img");
+  if(!img){img=document.createElement("img");img.id="goal-img";a.appendChild(img);}
+  img.src=src;ph.style.display="none";cb.style.display="flex";a.style.minHeight="200px";
+}
+function clearImage(e){
+  e.stopPropagation();
+  try{localStorage.removeItem("mbf_img");}catch(err){}
+  const img=document.getElementById("goal-img");if(img)img.remove();
+  document.getElementById("goal-ph").style.display="block";
+  document.getElementById("clear-btn").style.display="none";
+  document.getElementById("goal-area").style.minHeight="140px";
+  document.getElementById("file-input").value="";
+}
+
+function renderList(){
+  const s=gs(),exs=todayExs();
+  document.getElementById("exercise-list").innerHTML=exs.map(item=>{
+    const chk=isChk(s,item.id);
+    const dLabel=item.days.length<7?`<span class="day-badge">${dayLabel(item.days)}</span>`:"";
+    const timerBtn=item.type==='plank'
+      ?`<button class="timer-btn" onclick="event.stopPropagation();openPlankTimer()">⏱ タイマー</button>`
+      :`<button class="timer-btn" onclick="event.stopPropagation();openRepTimer('${item.id}')">⏱ タイマー</button>`;
+    return`<div class="task-card${chk?" done":""}" onclick="toggle('${item.id}')">
+      <div class="checkbox${chk?" checked":""}"><span class="chk-icon">✓</span></div>
+      <div style="flex:1">
+        <div class="task-name">${item.name}</div>
+        <div class="task-sub">${item.sub}</div>
+        <div class="task-dur">⏰ ${item.dur}</div>
+      </div>
+      ${timerBtn}
+      ${item.must?'<span class="must-badge">必須</span>':""}
+      ${dLabel}
+    </div>`;
+  }).join("");
+
+  document.getElementById("food-list").innerHTML=FOODS.map(item=>{
+    const chk=isChk(s,item.id);
+    return`<div class="task-card${chk?" done":""}" onclick="toggle('${item.id}')">
+      <div class="checkbox${chk?" checked":""}"><span class="chk-icon">✓</span></div>
+      <div style="flex:1"><div class="task-name">${item.name}</div><div class="task-sub">${item.sub}</div></div>
+      <span class="food-badge">食事</span>
+    </div>`;
+  }).join("");
+}
+
+function renderSchedule(){
+  const today=todayDow();
+  // type per day: 0=rest,1=arm,2=lower
+  const dayType=[0,1,2,0,1,2,0]; // 日月火水木金土
+  const typeColors=["","sch-arm","sch-lower"];
+  const typeIcons=[
+    ["腹筋","サイドクランチ","プランク"],
+    ["腹筋","サイドクランチ","プランク","椅子ディップス"],
+    ["腹筋","サイドクランチ","プランク","スクワット","ランジ","ヒップリフト"]
+  ];
+  const typeTimes=["約11分","約14分","約24分"];
+  let h="";
+  for(let d=0;d<7;d++){
+    const t=dayType[d],isT=d===today;
+    const colorClass=(isT?"sch-today ":"")+typeColors[t];
+    h+=`<div class="sch-col ${colorClass}">
+      <div class="sch-day">${DAY_NAMES[d]}</div>
+      <div class="sch-icons">${typeIcons[t].join("<br>")}</div>
+      <div class="sch-rest">${typeTimes[t]}</div>
+    </div>`;
+  }
+  document.getElementById("schedule-grid").innerHTML=h;
+}
+
+function renderCal(){
+  const s=gs(),t=new Date(),ts=tkey(),mids=EXERCISES.filter(e=>e.must).map(e=>e.id);
+  let h="";
+  for(let i=6;i>=0;i--){
+    const d=new Date(t);d.setDate(t.getDate()-i);
+    const k=d.toISOString().split("T")[0],day=s.days[k];
+    const done=day&&mids.every(id=>day.checked&&day.checked.includes(id));
+    const isT=k===ts;
+    h+=`<div class="cal-day ${done?"done":isT?"today":""}"><span>${d.getDate()}</span><span class="cl">${DAY_NAMES[d.getDay()]}</span></div>`;
+  }
+  document.getElementById("cal").innerHTML=h;
+}
+
+function render(){
+  const s=gs(),td=gtd(s);
+  const exs=todayExs();
+  const all=[...exs.map(e=>e.id),...FOODS.map(f=>f.id)];
+  const pct=Math.round(td.checked.length/all.length*100);
+  const now=new Date();
+  document.getElementById("date-label").textContent=
+    now.getFullYear()+"."+String(now.getMonth()+1).padStart(2,"0")+"."+String(now.getDate()).padStart(2,"0")+" "+
+    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][now.getDay()];
+  document.getElementById("streak").textContent=calcStreak(s);
+  document.getElementById("done-cnt").textContent=td.checked.length;
+  document.getElementById("total-cnt").textContent=s.total||0;
+  document.getElementById("pfill").style.width=pct+"%";
+  document.getElementById("pct").textContent=pct+"%";
+  document.getElementById("complete-msg").style.display=all.every(id=>td.checked.includes(id))?"block":"none";
+  const cw=s.cw||57;
+  document.getElementById("disp-cur").textContent=cw.toFixed(1);
+  const wp=Math.min(100,Math.max(0,Math.round((S-cw)/(S-F)*100)));
+  document.getElementById("wfill").style.width=wp+"%";
+  document.getElementById("wpct").textContent=wp+"%";
+  const lost=(S-cw).toFixed(1),rem=(cw-F).toFixed(1);
+  document.getElementById("wlost").textContent=
+    cw<=F?"最終目標達成！おめでとうございます 🎉":
+    cw<=53?"まず目標53kg達成！最終目標まであと"+rem+"kg":
+    "スタートから−"+lost+"kg ／ 最終目標まであと"+rem+"kg";
+
+  // 今日の所要時間
+  const totalMin=exs.reduce((acc,e)=>{
+    const m=parseInt((e.dur||"0分").replace(/[^0-9]/g,""));return acc+m;
+  },0);
+  document.getElementById("today-time-val").textContent="合計 約"+totalMin+"分";
+
+  renderList();
+  renderCal();
+  renderSchedule();
+  renderWeightChart();
+  try{
+    const si=localStorage.getItem("mbf_img");if(si)showImg(si);
+    const sc=localStorage.getItem("mbf_cap");if(sc)document.getElementById("goal-caption").value=sc;
+  }catch(e){}
+}
+document.getElementById("goal-caption").addEventListener("input",function(){
+  try{localStorage.setItem("mbf_cap",this.value);}catch(e){}
+});
+
+// ===== WEIGHT CHART =====
+let chartPeriod=30;  // render()より前に必ず初期化
+
+render();
+function setChartPeriod(days){
+  chartPeriod=days;
+  ['30','60','90'].forEach(d=>{
+    const btn=document.getElementById('btn-'+d);
+    if(btn)btn.className='chart-period-btn'+(d==days?' active':'');
+  });
+  renderWeightChart();
+}
+
+function renderWeightChart(){
+  const s=gs();
+  const canvas=document.getElementById('weight-chart');
+  if(!canvas)return;
+  const dpr=window.devicePixelRatio||1;
+  const cssW=canvas.offsetWidth||300;
+  const cssH=160;
+  canvas.width=Math.round(cssW*dpr);
+  canvas.height=Math.round(cssH*dpr);
+  canvas.style.height=cssH+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  const W=cssW, H=cssH;
+
+  const all=s.weights||[];
+  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-chartPeriod);
+  const pts=all.filter(w=>new Date(w.d)>=cutoff).sort((a,b)=>a.d.localeCompare(b.d));
+
+  const PAD={top:22,right:18,bottom:28,left:38};
+  const CW=W-PAD.left-PAD.right;
+  const CH=H-PAD.top-PAD.bottom;
+
+  // 背景
+  ctx.fillStyle='#fffcfc';
+  ctx.fillRect(0,0,W,H);
+
+  if(pts.length===0){
+    ctx.fillStyle='#b09598';
+    ctx.font='12px "Noto Sans JP",sans-serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('体重を記録するとグラフが表示されます',W/2,H/2);
+    return;
+  }
+
+  const vals=pts.map(p=>p.w);
+  const dataMin=Math.min(...vals);
+  const dataMax=Math.max(...vals);
+  // Y軸範囲：目標ラインも含める
+  const yMin=Math.min(dataMin,49)-0.8;
+  const yMax=Math.max(dataMax,57)+0.5;
+  const yRange=yMax-yMin;
+
+  const xPos=i=>PAD.left+(pts.length===1?CW/2:i/(pts.length-1)*CW);
+  const yPos=w=>PAD.top+(1-(w-yMin)/yRange)*CH;
+
+  // Y軸グリッド＆ラベル
+  ctx.setLineDash([2,3]);
+  ctx.lineWidth=0.8;
+  const yTicks=[];
+  for(let w=Math.ceil(yMin);w<=Math.floor(yMax);w++) yTicks.push(w);
+  yTicks.forEach(w=>{
+    const y=yPos(w);
+    ctx.strokeStyle='rgba(180,150,155,0.2)';
+    ctx.beginPath();ctx.moveTo(PAD.left,y);ctx.lineTo(W-PAD.right,y);ctx.stroke();
+    ctx.fillStyle='#b09598';
+    ctx.font='9px sans-serif';ctx.textAlign='right';ctx.textBaseline='middle';
+    ctx.fillText(w+'kg',PAD.left-4,y);
+  });
+  ctx.setLineDash([]);
+
+  // 目標ライン 53kg
+  if(53>=yMin&&53<=yMax){
+    const y=yPos(53);
+    ctx.strokeStyle='rgba(201,160,168,0.7)';ctx.setLineDash([5,4]);ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(PAD.left,y);ctx.lineTo(W-PAD.right,y);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#c9a0a8';ctx.font='bold 9px sans-serif';ctx.textAlign='left';ctx.textBaseline='bottom';
+    ctx.fillText('53',PAD.left+2,y-1);
+  }
+  // 目標ライン 49kg
+  if(49>=yMin&&49<=yMax){
+    const y=yPos(49);
+    ctx.strokeStyle='rgba(184,197,176,0.8)';ctx.setLineDash([5,4]);ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(PAD.left,y);ctx.lineTo(W-PAD.right,y);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#8aaa80';ctx.font='bold 9px sans-serif';ctx.textAlign='left';ctx.textBaseline='bottom';
+    ctx.fillText('49',PAD.left+2,y-1);
+  }
+
+  // エリア塗り
+  if(pts.length>1){
+    ctx.beginPath();
+    ctx.moveTo(xPos(0),yPos(pts[0].w));
+    pts.forEach((p,i)=>ctx.lineTo(xPos(i),yPos(p.w)));
+    ctx.lineTo(xPos(pts.length-1),PAD.top+CH);
+    ctx.lineTo(xPos(0),PAD.top+CH);
+    ctx.closePath();
+    const grad=ctx.createLinearGradient(0,PAD.top,0,PAD.top+CH);
+    grad.addColorStop(0,'rgba(212,160,168,0.22)');
+    grad.addColorStop(1,'rgba(212,160,168,0.01)');
+    ctx.fillStyle=grad;ctx.fill();
+  }
+
+  // 折れ線
+  ctx.strokeStyle='#d4a0a8';ctx.lineWidth=2;ctx.lineJoin='round';ctx.setLineDash([]);
+  ctx.beginPath();
+  pts.forEach((p,i)=>{ if(i===0)ctx.moveTo(xPos(i),yPos(p.w));else ctx.lineTo(xPos(i),yPos(p.w)); });
+  ctx.stroke();
+
+  // ドット＆ラベル
+  const today=tkey();
+  pts.forEach((p,i)=>{
+    const x=xPos(i),y=yPos(p.w),isT=p.d===today;
+    ctx.beginPath();ctx.arc(x,y,isT?5:3,0,Math.PI*2);
+    ctx.fillStyle=isT?'#b87880':'#d4a0a8';ctx.fill();
+    ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.stroke();
+    if(isT||(i===pts.length-1&&!pts.some(p2=>p2.d===today))||pts.length<=7){
+      ctx.fillStyle='#5a4548';ctx.font='bold 9px sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.fillText(p.w.toFixed(1),x,y-6);
+    }
+  });
+
+  // X軸ラベル
+  ctx.fillStyle='#b09598';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
+  const step=Math.max(1,Math.ceil(pts.length/5));
+  pts.forEach((p,i)=>{
+    if(i===0||i===pts.length-1||i%step===0){
+      const d=p.d.slice(5).replace('-','/');
+      ctx.fillText(d,xPos(i),H-PAD.bottom+4);
+    }
+  });
+}
+
+// ===== SPEECH =====
+function getJaVoice(){
+  const vv=window.speechSynthesis.getVoices();
+  return vv.find(v=>v.lang==='ja-JP')||vv.find(v=>v.lang.startsWith('ja'))||null;
+}
+function speak(text){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='ja-JP';u.rate=0.93;u.pitch=1.1;u.volume=1.0;
+  const jv=getJaVoice();if(jv)u.voice=jv;
+  window.speechSynthesis.speak(u);
+}
+// 前の音声が終わったら次を喋る
+function speakThen(text,cb){
+  if(!window.speechSynthesis){if(cb)cb();return;}
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='ja-JP';u.rate=0.93;u.pitch=1.1;u.volume=1.0;
+  const jv=getJaVoice();if(jv)u.voice=jv;
+  u.onend=()=>{if(cb)setTimeout(cb,400);};
+  window.speechSynthesis.speak(u);
+}
+if(window.speechSynthesis){
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
+}
+
+// ===== CLOSE HELPER =====
+function closeTimer(type){
+  if(type==='plank'){
+    if(PT.interval)clearInterval(PT.interval);
+    PT.phase='idle';
+    document.getElementById('plank-overlay').classList.remove('open');
+  } else {
+    if(RT.interval)clearInterval(RT.interval);
+    if(RT.vt)RT.vt.forEach(t=>clearTimeout(t));
+    RT.phase='idle';RT.vt=[];
+    document.getElementById('rep-overlay').classList.remove('open');
+  }
+  if(window.speechSynthesis)window.speechSynthesis.cancel();
+}
+
+// ===== PLANK TIMER =====
+let PT={interval:null,phase:'idle',set:1,seconds:0,SETS:3,SET_DUR:30,PREP_DUR:5,REST_DUR:30};
+
+function openPlankTimer(){
+  PT={interval:null,phase:'idle',set:1,seconds:0,SETS:3,SET_DUR:30,PREP_DUR:5,REST_DUR:30};
+  document.getElementById('plank-overlay').classList.add('open');
+  updatePlankUI();
+}
+
+function startPlankTimer(){
+  if(PT.phase!=='idle'&&PT.phase!=='done')return;
+  if(PT.interval)clearInterval(PT.interval);
+  PT={interval:null,phase:'prep',set:1,seconds:5,SETS:3,SET_DUR:30,PREP_DUR:5,REST_DUR:30};
+  speak('さあ、プランクを始めましょう！うつ伏せになって、肘をついて、体を一直線に保ってください。お腹をしっかり引き締めて！');
+  updatePlankUI();
+  PT.interval=setInterval(plankTick,1000);
+}
+
+function plankTick(){
+  PT.seconds--;
+  const {phase,seconds,set,SETS,SET_DUR,REST_DUR}=PT;
+  if(phase==='prep'){
+    if(seconds<=0){
+      PT.phase='set';PT.seconds=SET_DUR;
+      speak(set+'セット目、スタート！お腹に力を入れて、体をまっすぐキープ！');
+    } else if(seconds<=3){ speak(String(seconds)); }
+  } else if(phase==='set'){
+    if(seconds<=0){
+      if(set<SETS){
+        PT.phase='rest';PT.seconds=REST_DUR;
+        speak(set+'セット目完了！素晴らしい！'+REST_DUR+'秒休憩します。深呼吸してリカバリーしてください。');
+      } else {
+        PT.phase='done';clearInterval(PT.interval);PT.interval=null;
+        speak(SETS+'セット全て完了！お疲れ様でした！最高です！プランクを達成しました！');
+        setTimeout(()=>{ autoCheck('abs2'); },2500);
+      }
+    } else {
+      if(seconds===20)speak('あと20秒！いい調子です！');
+      else if(seconds===10)speak('あと10秒！もう少し！諦めないで！');
+      else if(seconds<=5&&seconds>0)speak(String(seconds));
+    }
+  } else if(phase==='rest'){
+    if(seconds<=0){
+      PT.set++;PT.phase='set';PT.seconds=SET_DUR;
+      speak(PT.set+'セット目スタート！ファイト！いけます！');
+    } else {
+      if(seconds===15)speak('折り返しです。もう少し休んでください。');
+      else if(seconds===10)speak('あと10秒で'+(set+1)+'セット目です！準備してください！');
+      else if(seconds<=5&&seconds>0)speak(String(seconds));
+    }
+  }
+  updatePlankUI();
+}
+
+function updatePlankUI(){
+  const {phase,seconds,set,SETS,SET_DUR,PREP_DUR,REST_DUR}=PT;
+  const numEl=document.getElementById('plank-num');
+  const unitEl=document.getElementById('plank-unit');
+  const msgEl=document.getElementById('plank-msg');
+  const lblEl=document.getElementById('plank-set-lbl');
+  const fillEl=document.getElementById('plank-bar-fill');
+  const circEl=document.getElementById('plank-circle');
+  const startBtn=document.getElementById('plank-start-btn');
+  if(phase==='idle')lblEl.textContent=SETS+'セット × 30秒';
+  else if(phase==='prep')lblEl.textContent='準備中...';
+  else if(phase==='set')lblEl.textContent=set+' / '+SETS+' セット目';
+  else if(phase==='rest')lblEl.textContent=set+'セット完了 — 休憩中';
+  else if(phase==='done')lblEl.textContent='COMPLETE ✓';
+  circEl.className='timer-circle';
+  numEl.className='timer-num';
+  if(phase==='idle'){ numEl.textContent='30';unitEl.textContent='秒'; }
+  else if(phase==='prep'){ numEl.textContent=seconds<=0?'GO!':seconds;numEl.classList.add('n-prep');circEl.classList.add('c-set');unitEl.textContent='秒'; }
+  else if(phase==='set'){ numEl.textContent=Math.max(0,seconds);if(seconds<=10)numEl.classList.add('n-warn');circEl.classList.add('c-set');unitEl.textContent='秒'; }
+  else if(phase==='rest'){ numEl.textContent=Math.max(0,seconds);numEl.classList.add('n-rest');circEl.classList.add('c-rest');unitEl.textContent='秒（休憩）'; }
+  else if(phase==='done'){ numEl.textContent='✓';numEl.classList.add('n-done');circEl.classList.add('c-done');unitEl.textContent=''; }
+  const msgMap={idle:'スタートボタンを押して<br>プランクを始めましょう！',prep:'体制を整えてください<br>うつ伏せで肘をついて...',rest:'休憩中... 深呼吸して<br>次のセットに備えましょう',done:'全セット完了！<br>素晴らしい頑張りでした 🌸'};
+  if(phase==='set') msgEl.innerHTML=seconds<=10?'もう少し！諦めないで！<br>あと'+Math.max(0,seconds)+'秒！':'体をまっすぐキープ！<br>お腹に力を入れて！';
+  else msgEl.innerHTML=msgMap[phase]||'';
+  let pct=0;
+  if(phase==='prep')pct=((PREP_DUR-Math.max(0,seconds))/PREP_DUR)*100;
+  else if(phase==='set')pct=((SET_DUR-Math.max(0,seconds))/SET_DUR)*100;
+  else if(phase==='rest')pct=((REST_DUR-Math.max(0,seconds))/REST_DUR)*100;
+  else if(phase==='done')pct=100;
+  fillEl.style.width=Math.min(100,Math.max(0,pct))+'%';
+  fillEl.className='timer-bar-fill'+(phase==='rest'?' b-rest':'');
+  for(let i=1;i<=SETS;i++){
+    const dot=document.getElementById('plank-dot-'+i);if(!dot)continue;
+    dot.className='timer-dot';
+    if(phase==='done'||i<set||(i===set&&phase==='rest'))dot.classList.add('d-done');
+    else if(i===set&&(phase==='set'||phase==='prep'))dot.classList.add('d-active');
+  }
+  startBtn.style.display=(phase==='idle'||phase==='done')?'':'none';
+  startBtn.textContent=phase==='done'?'↺ もう一度':'▶ スタート';
+}
+
+// ===== REP TIMER =====
+let RT={interval:null,phase:'idle',set:1,seconds:0,exId:null,ex:null,vt:[]};
+
+function openRepTimer(exId){
+  const ex=EXERCISES.find(e=>e.id===exId);if(!ex||ex.type!=='rep')return;
+  if(RT.vt)RT.vt.forEach(t=>clearTimeout(t));
+  RT={interval:null,phase:'idle',set:1,seconds:0,exId,ex,vt:[]};
+  document.getElementById('rep-title').textContent=ex.name;
+  document.getElementById('rep-sub').textContent=ex.sets+'セット × '+ex.reps+'回';
+  let dots='';for(let i=1;i<=ex.sets;i++)dots+=`<div class="timer-dot" id="rep-dot-${i}"></div>`;
+  document.getElementById('rep-dots').innerHTML=dots;
+  document.getElementById('rep-overlay').classList.add('open');
+  updateRepUI();
+}
+
+// セット中にフォーム確認と励ましを自動発声（7秒後・20秒後）
+function scheduleSetVoice(ex){
+  if(RT.vt)RT.vt.forEach(t=>clearTimeout(t));
+  RT.vt=[];
+  if(ex.voice.form){
+    RT.vt.push(setTimeout(()=>{
+      if(RT.phase==='set')speak(ex.voice.form);
+    },7000));
+  }
+  if(ex.voice.encourage){
+    RT.vt.push(setTimeout(()=>{
+      if(RT.phase==='set')speak(ex.voice.encourage);
+    },20000));
+  }
+}
+
+function startRepTimer(){
+  if(RT.phase!=='idle'&&RT.phase!=='done')return;
+  if(RT.vt)RT.vt.forEach(t=>clearTimeout(t));
+  RT.set=1;RT.phase='set';RT.seconds=0;RT.vt=[];
+  // イントロ（姿勢説明）が終わってからセット開始の声がけ
+  speakThen(RT.ex.voice.intro, ()=>{
+    speak(RT.ex.voice.setStart(1));
+    scheduleSetVoice(RT.ex);
+  });
+  updateRepUI();
+}
+
+function repSetComplete(){
+  if(RT.phase!=='set')return;
+  if(RT.vt)RT.vt.forEach(t=>clearTimeout(t));RT.vt=[];
+  const {ex,set}=RT;
+  speak(ex.voice.setDone(set));
+  if(set<ex.sets){
+    RT.phase='rest';RT.seconds=ex.rest;
+    setTimeout(()=>{ speak(ex.voice.rest(ex.rest)); },1200);
+    RT.interval=setInterval(repRestTick,1000);
+  } else {
+    RT.phase='done';
+    setTimeout(()=>{ speak(ex.voice.done); },1000);
+    setTimeout(()=>{ autoCheck(ex.id); },3500);
+  }
+  updateRepUI();
+}
+
+function repRestTick(){
+  RT.seconds--;
+  if(RT.seconds<=5&&RT.seconds>0)speak(String(RT.seconds));
+  if(RT.seconds<=0){
+    clearInterval(RT.interval);RT.interval=null;
+    RT.set++;RT.phase='set';RT.seconds=0;
+    // 次セット開始：nextSet → setStart → フォーム確認・励まし予約
+    speakThen(RT.ex.voice.nextSet(RT.set),()=>{
+      speak(RT.ex.voice.setStart(RT.set));
+      scheduleSetVoice(RT.ex);
+    });
+  }
+  updateRepUI();
+}
+
+function updateRepUI(){
+  const {phase,seconds,set,ex}=RT;
+  if(!ex)return;
+  const numEl=document.getElementById('rep-num');
+  const unitEl=document.getElementById('rep-unit');
+  const msgEl=document.getElementById('rep-msg');
+  const subEl=document.getElementById('rep-sub');
+  const fillEl=document.getElementById('rep-bar-fill');
+  const circEl=document.getElementById('rep-circle');
+  const doneBtn=document.getElementById('rep-done-btn');
+  const startBtn=document.getElementById('rep-start-btn');
+  circEl.className='timer-circle';
+  numEl.className='timer-num';
+  if(phase==='idle'){
+    numEl.textContent='1';numEl.classList.add('n-rep');unitEl.textContent='セット目';
+    subEl.textContent=ex.sets+'セット × '+ex.reps+'回';
+    msgEl.innerHTML='スタートを押して<br>始めましょう！';
+    fillEl.style.width='0%';
+    doneBtn.style.display='none';startBtn.style.display='block';startBtn.textContent='▶ スタート';
+  } else if(phase==='set'){
+    circEl.classList.add('c-set');
+    numEl.textContent=set;numEl.classList.add('n-rep');unitEl.textContent='セット目';
+    subEl.textContent=set+' / '+ex.sets+' セット目';
+    msgEl.innerHTML='<strong>'+ex.reps+'回</strong> しっかりやりきって！<br>完了したらボタンを押してください';
+    fillEl.style.width=(((set-1)/ex.sets)*100)+'%';
+    doneBtn.style.display='block';startBtn.style.display='none';
+  } else if(phase==='rest'){
+    circEl.classList.add('c-rest');
+    numEl.textContent=Math.max(0,seconds);numEl.classList.add('n-rest');unitEl.textContent='秒（休憩）';
+    subEl.textContent=set+'セット完了 — 休憩中';
+    msgEl.innerHTML='深呼吸して<br>次のセットに備えましょう';
+    const pct=((ex.rest-Math.max(0,seconds))/ex.rest)*100;
+    fillEl.style.width=Math.min(100,pct)+'%';
+    fillEl.className='timer-bar-fill b-rest';
+    doneBtn.style.display='none';startBtn.style.display='none';
+  } else if(phase==='done'){
+    circEl.classList.add('c-done');
+    numEl.textContent='✓';numEl.classList.add('n-done');unitEl.textContent='';
+    subEl.textContent='COMPLETE ✓';
+    msgEl.innerHTML='全セット完了！<br>素晴らしい頑張りでした 🌸';
+    fillEl.style.width='100%';
+    doneBtn.style.display='none';startBtn.style.display='block';startBtn.textContent='↺ もう一度';
+  }
+  if(phase!=='rest') fillEl.className='timer-bar-fill';
+  // dots
+  for(let i=1;i<=ex.sets;i++){
+    const dot=document.getElementById('rep-dot-'+i);if(!dot)continue;
+    dot.className='timer-dot';
+    if(phase==='done'||i<set)dot.classList.add('d-done');
+    else if(i===set&&phase==='set')dot.classList.add('d-active');
+  }
+}
+
+// ===== AUTO CHECK =====
+function autoCheck(id){
+  const s=gs(),td=gtd(s);
+  if(!td.checked.includes(id)){
+    td.checked.push(id);
+    const all=[...todayExs().map(e=>e.id),...FOODS.map(f=>f.id)];
+    if(all.every(i=>td.checked.includes(i))&&!td.completed){td.completed=true;s.total=(s.total||0)+1;}
+    ss(s);render();
+  }
+}
+</script>
+</body>
+</html>
